@@ -49,4 +49,11 @@ The steps for TDD is:
 
 ### Commands that you can find useful
 - `pip install bandit` to install bandit 
-- `bandit -r <FOLDER_PATH_OF_YOUR_CODE>` 
+- `bandit -r <FOLDER_PATH_OF_YOUR_CODE>`
+
+### Rubric
+- Python source code [25%]
+- Python test code [25%]
+- Examples of test case failures [25%]
+- Examples of test case successes [25%]
+

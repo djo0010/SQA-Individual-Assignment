@@ -43,7 +43,7 @@ The steps for TDD is:
   - The calculator must be able to find square root of a number
   - All methods related to mathematical operations should handle division by zero exceptions
   - Written code has been scanned by a static analysis tool. You will apply static analysis to your Python program files. Use the [Bandit](https://bandit.readthedocs.io/en/latest/) tool to perform static analysis and report any weaknesses that you find in a TEXT file
-- Submit your Python program files and  your TEXT file on CANVAS @ `Workshop 1`
+- Submit your Python program files and  your TEXT file on CANVAS @ `Assignment 1`
 - Due: Feb 09, 2025
 
 

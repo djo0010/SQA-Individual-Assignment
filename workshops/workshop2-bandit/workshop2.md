@@ -30,7 +30,7 @@ Security weaknesses can be identified using two ways: manual inspection by an ex
 
 ### Post Lab Experience 
 - Run Bandit against all Python files in the `workshop2.zip` file 
-  - Extract `workshop2.zip` that is located here: https://github.com/paser-group/continuous-secsoft/tree/master/software-quality-assurance/workshops/workshop2/
+  - Extract `workshop2.zip` that is located here: (https://github.com/effat/SQA-2025/tree/ALAMOSE/workshops/workshop2-bandit)
   - Run Bandit by specifying the extracted directory. You might need the `-a`, `-f`, `-r`, and the `-o` flag 
   - Observe the security weaknesses 
 - Report the name of the three most frequent security weaknesses detected by Bandit in a document 

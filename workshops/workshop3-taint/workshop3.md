@@ -19,7 +19,7 @@ In our class lectures we learned the importance on why bugs and security vulnera
 ### In-class Hands-on Experience 
 
 
-- Check the code out in `https://github.com/paser-group/continuous-secsoft/tree/master/software-quality-assurance/workshops/workshop3/calc.py` and `https://github.com/paser-group/continuous-secsoft/tree/master/software-quality-assurance/workshops/workshop3/analysis.py`
+- Check the code out in `(https://github.com/effat/SQA-2025/blob/ALAMOSE/workshops/workshop3-taint/calc.py)` and `(https://github.com/effat/SQA-2025/blob/ALAMOSE/workshops/workshop3-taint/analysis.py)`
 - Understand the code in `workshop3/calc.py` to see manually how simpleCalculator() works
 - Write the flow of execution for `workshop3/calc.py` 
 - Understand the code in `workshop3/analysis.py` to understand how parse tree and relevant components from `workshop3/calc.py` have been extracted

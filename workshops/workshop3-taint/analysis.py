@@ -1,5 +1,5 @@
 '''
-Akond Rahman 
+Credit: Akond Rahman 
 Python variable tracking 
 Source: https://docs.python.org/3/library/ast.html
 '''
@@ -9,6 +9,11 @@ import pandas as pd
 
 
 def getBinOpDetails(assiTarget, assiValue, element_type = 'SINGLE_ASSIGNMENT' ): 
+    '''
+    Takes care of element_type = 'SINGLE_ASSIGNMENT', such as, a = 5. Returns an AST node in the form 
+    of 'a= 5'
+    '''
+    
     lhs_var, rhs_var = '', '' 
     var_assignment_list = []
 
@@ -29,6 +34,10 @@ def getBinOpDetails(assiTarget, assiValue, element_type = 'SINGLE_ASSIGNMENT' ):
     return var_assignment_list
 
 def getTupAssiDetails(assiTargets, assiValue, element_type = 'TUPLE_ASSIGNMENT' ): 
+    '''
+    Takes care of element_type = 'TUPLE_ASSIGNMENT', such as, a, b, c = 5, 10, -1. Returns an AST node in the form 
+    of 'a, b, c= 5, 10, -1'
+    '''
     # print('INSIDE TUPLE')
     var_assignment_list = []
     # print(assiTargets, assiValue)
@@ -55,13 +64,15 @@ def getTupAssiDetails(assiTargets, assiValue, element_type = 'TUPLE_ASSIGNMENT' 
 
 def getCommonAssiDetails(assignDict, elemType):
     assignTargets, assignValue = assignDict['targets'], assignDict['value']
+    # a= 5
+    # a, b, c = 5, 10, -1
     var_details_bin  = getBinOpDetails( assignTargets, assignValue , elemType ) 
     var_details_tup  = getTupAssiDetails( assignTargets, assignValue , elemType ) 
     return var_details_bin, var_details_tup 
 
 def getVariables(tree_, elemTypeParam):
     '''
-    Input: Python parse tree object 
+    Input: Python parse tree object and the type of elements we want to extract 
     Output: All expressions as list of tuples 
     '''
     final_list  = [] 
@@ -163,23 +174,21 @@ def trackTaint(val2track, df_list_param):
     var_, call_, func_def, func_var = df_list_param[0], df_list_param[1], df_list_param[2], df_list_param[3]
     
     #TODO: Complete this method so that the output is 1000->val1->v1->res 
-    print(var_) 
-    print("\n")
-    print(call_)
-    print("\n")
-    print(func_def)
-    print("\n")
-    print(func_var)
+    
 
 
 
 def checkFlow(data, code):
     full_tree = None 
     if os.path.exists( code ):
-       full_tree = ast.parse( open( code  ).read() )  
+       full_tree = ast.parse( open( code  ).read() ) 
+       print("printing full tree", full_tree) 
+       print("printing full tree type",type(full_tree))
        # First let us obtain the variables in forms of expressions 
        fullVarList = getVariables(full_tree, 'VAR_ASSIGNMENT') 
        # Next let us get function invocations by looking into function calls
+       ### Function call return values are assigned to a variable from where it
+       ## was called
        call_list = getFunctionAssignments( full_tree ) 
        # Now let us look into the body of the function and see of the parameter is used
        funcDefList, funcvarList = getFunctionDefinitions( code  )      

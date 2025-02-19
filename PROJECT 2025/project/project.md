@@ -19,13 +19,12 @@ The objective of this project is to integrate software quality assurance activit
 
    - 4.c. Integrate forensics by modifying 5 Python methods of your choice. (20%)
 
-5. Report your activities and lessons learned. Put the report in your repo as `REPO.md` (3%)   
+5. Report your activities and lessons learned. Put the report in your repo as `REPO.md` (5%)   
 
 ##### Individual Activities 
 
 1. Use `vault4paper.py` to remove hard-coded secrets in all YAML files and Puppet files respectively, in the `Ansible` and `Puppet` directories. (40%)
 
-2. Complete the survey related to secrets: https://forms.office.com/r/94Cjxirm1f (2%)
 
 ### Deliverables 
 
@@ -41,5 +40,15 @@ The objective of this project is to integrate software quality assurance activit
 1. Upload Ansible and Puppet scripts after removal of secrets on CANVAS (`Individual-Project-Task`)
 
 ### Deadline to Complete All Activities 
+1. April 21, 2025
+
+
+
+
+
+
+
+
+
 
 December 01, 2023 

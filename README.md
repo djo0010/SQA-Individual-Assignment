@@ -1,14 +1,15 @@
 # COMP 5710/6710: Secure Software Analysis 
 
 ## Instructor 
-> Effat Farhana, Ph.D.                                   
+> Effat Farhana, Ph.D.
+                                
 > e.farhana@auburn.edu     
 > 3127A Shelby Center, 345 West Magnolia Avenue, Auburn, AL
 > Office hours: Monday, 11:00 AM – 12:00 PM CST
 
 ## Teaching Assistants:  
 > Jahidul Arafat
->  >jahidapon@gmail.com and jza0145@auburn.edu 
+>  jahidapon@gmail.com and jza0145@auburn.edu 
 
 ## Materials 
 

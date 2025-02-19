@@ -9,7 +9,7 @@ The objective of this project is to integrate software quality assurance activit
 ##### Group Activities 
 
 1. Unpack the project `KubeSec.zip`. (1%)
-2. Upload project as a GitHub repo on `github.com`. Format of the repo name is `TEAMNAME-SQA2023-AUBURN`  (2%)
+2. Upload project as a GitHub repo on `github.com`. Format of the repo name is `TEAMNAME-SQA2025-AUBURN`  (2%)
 3. In your project repo create `README.md` listing your team name and team members. (2%)
 4. Apply the following activities related to software quality assurance:
 
@@ -30,7 +30,7 @@ The objective of this project is to integrate software quality assurance activit
 
 ##### Group 
 
-1. A repo hosted on GitHub. Name of the repo will be `TEAMNAME-SQA2023-AUBURN` 
+1. A repo hosted on GitHub. Name of the repo will be `TEAMNAME-SQA2025-AUBURN` 
 2. Full completion of all activities as recorded on the GitHub repository 
 3. Report describing what activities your performed and what you have learned 
 4. Logs/screenshots that show execution of forensics, fuzzing, and static analysis 
@@ -40,15 +40,5 @@ The objective of this project is to integrate software quality assurance activit
 1. Upload Ansible and Puppet scripts after removal of secrets on CANVAS (`Individual-Project-Task`)
 
 ### Deadline to Complete All Activities 
-1. April 21, 2025
+ April 21, 2025
 
-
-
-
-
-
-
-
-
-
-December 01, 2023 

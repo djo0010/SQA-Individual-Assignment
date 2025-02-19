@@ -35,7 +35,7 @@ The objective of this project is to integrate software quality assurance activit
 3. Report describing what activities your performed and what you have learned 
 4. Logs/screenshots that show execution of forensics, fuzzing, and static analysis 
 
-##### 
+##### Individual
 
 1. Upload Ansible and Puppet scripts after removal of secrets on CANVAS (`Individual-Project-Task`)
 

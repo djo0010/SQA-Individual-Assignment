@@ -35,7 +35,7 @@ In our class lectures we learned the importance on why bugs and security vulnera
 ###  Rubric
 - Description of flow of execution for calc.py [20%]
 - Implementation of analysis.py [70%]
-- Explataion of implementation of analysis.py as code comment [10%]
+- Explanataion of implementation of analysis.py as code comment [10%]
   
 
 

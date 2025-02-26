@@ -45,15 +45,17 @@ In this workshop we will use a tool called [SLI-KUBE](https://hub.docker.com/rep
 - Report the three most frequent security misconfigurations as determined by SLI-KUBE. Your report should include a 1-sentence description. Use `Section-2.3` from `paper.pdf`. 
     - If you get `NO_NETWORK_POLICY` then you can use the following text: `The misconfiguration category that is related with not specifying network policies. Without specifying network policies Kubernetes installations are susceptible to unauthorized accesses.`
     - If you get `NO_ROLLING_UPDATE` then you can use the following text: `The misconfiguration category that is related with not explicitly specifying RollingUpdate in the configuration file. A lack of rolling updates makes a Kubernetes installation susceptible to supply chain related attacks.`     
-- Upload your report on `Assignment 4 - SLIKUBE Usage for Configuration Scanning` @ CANVAS 
+- Upload a zip file on `Assignment 4 - SLIKUBE Usage for Configuration Scanning` @ CANVAS 
   
+    - Report on security misconfiguration
+    - In-class workshop screenshots
 
 #### Rubric 
 
 - Report : 25%
 - Definitions of security misconfigurations: 40%
 - Names of security misconfigurations: 25% 
-- Workshop: 10%
+- In-class workshop: 10%
 
 #### Note About Windows Machines
 

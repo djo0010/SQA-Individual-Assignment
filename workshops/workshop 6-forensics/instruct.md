@@ -1,4 +1,4 @@
-## Workshop 10
+## Workshop 6
 
 ## Workshop Name: Software Forensics Through Application of Logging in Machine Learning Code 
 
@@ -56,19 +56,18 @@ We first need to know what to log and how to log. Let us use the following heuri
 
 ### Post Lab Experience
 
-Imagine this scenario: Dolly, a data science specialist at Auburn University. University has written machine learning (ML) code in `w10.py`. The output is correct but she just learned about adversarial machine learning, which talks about how ML code can be attacked. She learned that ML models are susceptible to security issues:  
+Imagine this scenario: Dolly, a data science specialist at Auburn University. University has written machine learning (ML) code in `w6.py`. The output is correct but she just learned about adversarial machine learning, which talks about how ML code can be attacked. She learned that ML models are susceptible to security issues:  
 
 1. `poisoning attacks` that are introduced through passing in erroneous dataset files into ML code 
 2. `model tricking` that are results of models that are being attacked, which gives erroneous results. Incorrect prediction performance is an indicator of ML models being attacked.  
 
-- Assist Dolly by writing logging code in the correct locations in `w10.py` with comments so that the two above-mentioned issues are logged for all provided ML functions. After writing the code, put in comments to justify your code, save `w10.py`. 
+- Assist Dolly by writing logging code in the correct locations in `w6.py` with comments so that the two above-mentioned issues are logged for all provided ML functions. After writing the code, put in comments to justify your code, save `w6.py`. 
 - You have the freedom to choose the locations that you think needs to be logged 
 - Feel free to use the logger the instructor has provided in class 
-- You do not have to generate the logs by executing `w10.py`
-- You must find and add logging code to seven locations with comments (70%)
+- You do not have to generate the logs by executing `w6.py`
+- You must find and add logging code to ten locations with comments (100%)
 - Submit your code at `CANVAS` 
-- Complete the survey (https://auburn.qualtrics.com/jfe/form/SV_6W19tf7NcRt5y4K) (30%)
-- Due Nov 01, 2024
+- Due April 13, 2025
 
 
 ### Rubric 

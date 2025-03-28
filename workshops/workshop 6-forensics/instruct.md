@@ -72,5 +72,5 @@ Imagine this scenario: Dolly, a data science specialist at Auburn University. Un
 
 ### Rubric 
 
-- Code with comments: 80%
-- Survey: 20% 
+- Code : 80%
+- Comments: 20% 

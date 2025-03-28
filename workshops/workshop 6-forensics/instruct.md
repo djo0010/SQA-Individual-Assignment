@@ -64,7 +64,7 @@ Imagine this scenario: Dolly, a data science specialist at Auburn University. Un
 - Assist Dolly by writing logging code in the correct locations in `w6.py` with comments so that the two above-mentioned issues are logged for all provided ML functions. After writing the code, put in comments to justify your code, save `w6.py`. 
 - You have the freedom to choose the locations that you think needs to be logged 
 - Feel free to use the logger the instructor has provided in class 
-- You do not have to generate the logs by executing `w6.py`
+- You need to install required packages, such as tensorFlow, sklearn, and others
 - You must find and add logging code to ten locations with comments (100%)
 - Submit your code at `CANVAS` 
 - Due April 13, 2025

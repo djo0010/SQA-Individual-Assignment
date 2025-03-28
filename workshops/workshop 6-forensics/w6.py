@@ -111,7 +111,7 @@ def k_fold_cv_mlp(n_splits):
       folds.append((train_index, test_index))
 
 
-  # Initialize your machine learning model (e.g., Logistic Regression)
+  # Initialize machine learning model, MLP
   model = MLPClassifier(hidden_layer_sizes=(256,128,64,32),activation="relu",random_state=1)
 
   # Initialize a list to store the evaluation scores

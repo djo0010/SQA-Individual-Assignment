@@ -15,7 +15,7 @@ Students enrolled in COMP 6710
 - Your summary should be 1 page long 
 - Your summary should contain the following sections:
   - `Applied technique` where you state the techniques used in the paper  
-  - `Defects identified` where you map the defects listed in the paper to each paper title 
+  - `Defects/warnings identified` where you map the defects/warnings listed in the paper to each paper title 
 
 ## Due 
 

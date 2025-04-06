@@ -10,7 +10,7 @@ Students enrolled in COMP 6710
 
 ## Tasks 
 
-- Read all the paper in the `lit4COMP6710` directory
+- Read all the paper in the `Papers` directory
 - Create a summary in forms of a PDF file 
 - Your summary should be 1 page long 
 - Your summary should contain the following sections:

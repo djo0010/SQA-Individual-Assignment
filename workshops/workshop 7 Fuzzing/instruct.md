@@ -32,5 +32,5 @@ that fuzzes an existing implementation of a simple calculator.
 - Due: Apr 20, 2025
 
 - ### Workshop 7 (Rubric) 
-- Branch and statement coverage for four test cases          = 10%
-- Screenshots of 10 crash messages and code implementation   = 90%
+- Branch and statement coverage for four test cases          = 20%
+- Screenshots of 10 crash messages and code implementation   = 80%

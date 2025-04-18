@@ -41,7 +41,7 @@ In that spirit, we as a class  will build a mini tool that automatically runs st
   - Grab your output by capturing the screenshots 
   - Modify any CPP file in the `NumCPP` repository 
   - Upload your `pre-commit` file and your screenshots on CANVAS 
-- Complete the [survey](https://auburn.qualtrics.com/jfe/form/SV_bryx8vonSvVmW5o) 
+
 - Due: April 27, 2025
 
 

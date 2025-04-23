@@ -6,29 +6,29 @@ rsyslog_host: localhost
 
 database_clients: [ "{{ mysql_host }}" ]
 
-mysql_root_password: secret
+mysql_root_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_30965 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
 mysql_passwords:
-  teams: secret
-  eb: secret
-  pdp_server: secret
-  aa_server: secret
-  spdashboard: secret
-  shibboleth: secret
-  lifecycle: secret
+  teams: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_41328 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+  eb: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_4484 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+  pdp_server: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_83403 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+  aa_server: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_52476 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+  spdashboard: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_38811 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+  shibboleth: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_30512 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+  lifecycle: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_22775 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
 mongo_passwords:
-   manage: secret
-   oidcng: secret
-   myconext: secret
+   manage: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_82426 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+   oidcng: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_1230 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
+   myconext: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_82009 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
-mongo_admin_password: secret
+mongo_admin_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_9575 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
-engine_parameters_secret: secret
+engine_parameters_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_11085 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
-profile_secret: secret
+profile_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_65164 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
-teams_authz_client_secret: secret
+teams_authz_client_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_92943 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 teams_migration_secret_key: secret
 
 engine_api_metadata_push_password: secret

@@ -47,7 +47,6 @@ def retrieveSecret(client_, cnt_, tech_str):
     read_response      = client_.secrets.kv.read_secret_version(path=secret_path, raise_on_deleted_version=False) 
     secret_from_vault  = read_response['data']['data']['password']
     # print('The secret we have obtained:')
-    print()
     print("To retrieve the secret '{}' please plugin the following code snippet in your script:".format( secret_from_vault) )
 
     if tech_str == 'A': 

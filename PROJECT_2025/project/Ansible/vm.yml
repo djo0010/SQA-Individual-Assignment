@@ -131,7 +131,7 @@ dashboard_jira_password: NA
 influxdb_admin_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_63942 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 influxdb_stats_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_87202 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 
-oidcng_secure_secret:  Y3nS5p0bKLI8bR/thxo0CFS3uItJXifjfRymRGOGJhRgij48ttTjPR33ZdAhobHrXd5MJNz4X69wYKvsUMlIfg==
+oidcng_secure_secret:  "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16450 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 oidcng_private_key: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_45642 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 
 oidcng_secret_keyset: |

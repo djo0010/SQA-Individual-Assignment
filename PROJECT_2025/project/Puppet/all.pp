@@ -2,7 +2,7 @@ class { 'openstack::all':
   public_address       => $::ipaddress_eth0,
   mysql_root_password  => Deferred('vault_lookup::lookup', ["SECRET_PATH_25707/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   rabbit_password      => Deferred('vault_lookup::lookup', ["SECRET_PATH_40915/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
-  keystone_db_password => 'Deferred('vault_lookup::lookup', ["SECRET_PATH_26870/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
+  keystone_db_password => Deferred('vault_lookup::lookup', ["SECRET_PATH_26870/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   keystone_admin_token => Deferred('vault_lookup::lookup', ["SECRET_PATH_49295/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   admin_email          => 'root@localhost',
   admin_password       => Deferred('vault_lookup::lookup', ["SECRET_PATH_23317/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),

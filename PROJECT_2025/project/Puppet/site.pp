@@ -7,27 +7,27 @@ node 'glance_keystone_mysql' {
   class { '::keystone':
     debug        => true,
     catalog_type => 'sql',
-    admin_token  => 'admin_token',
+    admin_token  => Deferred('vault_lookup::lookup', ["SECRET_PATH_14524/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
   class { '::keystone::db::mysql':
-    password => 'keystone',
+    password => Deferred('vault_lookup::lookup', ["SECRET_PATH_99238/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
   class { '::keystone::roles::admin':
     email    => 'test@puppetlabs.com',
-    password => 'ChangeMe',
+    password => Deferred('vault_lookup::lookup', ["SECRET_PATH_25424/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
   class { '::glance::api':
     debug               => true,
     auth_type           => 'keystone',
     keystone_tenant     => 'services',
     keystone_user       => 'glance',
-    keystone_password   => 'glance_password',
+    keystone_password   => Deferred('vault_lookup::lookup', ["SECRET_PATH_34870/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
     database_connection => 'mysql+pymysql://glance:glance@127.0.0.1/glance',
   }
   class { '::glance::backend::file': }
 
   class { '::glance::db::mysql':
-    password => 'glance',
+    password => Deferred('vault_lookup::lookup', ["SECRET_PATH_69379/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
     dbname   => 'glance',
     user     => 'glance',
     host     => '127.0.0.1',
@@ -40,11 +40,11 @@ node 'glance_keystone_mysql' {
     auth_type           => 'keystone',
     keystone_tenant     => 'services',
     keystone_user       => 'glance',
-    keystone_password   => 'glance_password',
+    keystone_password   => Deferred('vault_lookup::lookup', ["SECRET_PATH_31379/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
     database_connection => 'mysql+pymysql://glance:glance@127.0.0.1/glance',
   }
   class { '::glance::keystone::auth':
-    password => 'glance_pass',
+    password => Deferred('vault_lookup::lookup', ["SECRET_PATH_56283/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
 }
 

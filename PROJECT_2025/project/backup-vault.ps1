@@ -1,5 +1,5 @@
 $env:VAULT_ADDR = "http://127.0.0.1:8200"
-$backupFile = "vault_backup.json"
+$backupFile = "vault_backup2.json"
 $allSecrets = @{}
 
 $keys = vault kv list -format=json secret/ | jq -r '.[]'

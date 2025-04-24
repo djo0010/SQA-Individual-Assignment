@@ -27,7 +27,7 @@ import random
 '''
 
 counter_mapper           = {}
-hvac_token               = "hvs.JFNYOJZmmgb65ER5y8itMh0F" ## this should come from the output of *vault server -dev* 
+hvac_token               = "hvs.OaljJCdZZ56rwmoCOHvWiyPJ" ## this should come from the output of *vault server -dev* 
 hvac_url                 = "http://127.0.0.1:8200"        ## this should come from the output of *vault server -dev*
 ansible_secret_retrieval = '"{{ lookup(' + "'hashi_vault', 'secret=secret/data/"  
 puppet_secret_retrieval  = "Deferred('vault_lookup::lookup', ["  

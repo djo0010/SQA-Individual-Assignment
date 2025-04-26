@@ -33,7 +33,7 @@ build_status_delay: 15
 deploy_status_retries: 25
 deploy_status_delay: 25
 
-kie_admin_user: adminUser
+kie_admin_user: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_7753 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
 kie_admin_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_60750 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
 nexus_project_display_name: "Sonatype Nexus"
@@ -44,7 +44,7 @@ nexus_cpu_request: 1
 nexus_cpu_limit: 2
 nexus_version: "3.25.1"
 
-nexus_admin_user: admin
+nexus_admin_user: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_62474 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
 nexus_admin_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_81835 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 
 #nexus_remote_proxy_repos:
@@ -113,11 +113,11 @@ kieserver_java_max_mem_ratio: 60
 kieserver_java_initial_mem_ratio: 0
 kieserver_gc_max_metaspace_size: 500
 
-kieserver_controller_user: controllerUser
+kieserver_controller_user: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_34375 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
 kieserver_controller_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_44679 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
-kieserver_user: executionUser
+kieserver_user: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_95857 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
 kieserver_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_99593 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
-kie_maven_user: adminUser
+kie_maven_user: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_63773 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
 kie_maven_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_84078 token=hvs.JFNYOJZmmgb65ER5y8itMh0F url=http://127.0.0.1:8200')['password'] }}"
 kie_mbeans: enabled
 

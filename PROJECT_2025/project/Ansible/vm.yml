@@ -123,10 +123,10 @@ stats_sysadmin_api_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRE
 stats_oidc_client_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16167 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 stats_oidc_crypto_pass: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16508 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 
-dashboard_sab_password: NA
-dashboard_sab_rest_password: NA
-dashboard_sp_dashboard_password: NA
-dashboard_jira_password: NA
+dashboard_sab_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_84292 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
+dashboard_sab_rest_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_96752 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
+dashboard_sp_dashboard_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_44509 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
+dashboard_jira_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_37807 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
 
 influxdb_admin_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_63942 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 influxdb_stats_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_87202 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
@@ -134,24 +134,9 @@ influxdb_stats_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PA
 oidcng_secure_secret:  "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16450 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 oidcng_private_key: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_45642 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 
-oidcng_secret_keyset: |
-  {
-    "primaryKeyId": 679793344,
-    "key": [
-    {
-      "keyData": {
-        "typeUrl": "type.googleapis.com/google.crypto.tink.AesCtrHmacAeadKey",
-        "keyMaterialType": "SYMMETRIC",
-        "value": "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_47858 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
-      },
-      "outputPrefixType": "TINK",
-      "keyId": 679793344,
-      "status": "ENABLED"
-    }
-    ]
-  }
-  
-oidcng_associated_data: 0B969613-89B9-4AC4-BC2F-363EFE1B21E7
+oidcng_secret_keyset: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_61967 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
+
+oidcng_associated_data: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_81049 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"
 oidcng_access_token_one_way_hash_salt: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_57682 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 
 myconext_private_key: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_74841 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    

@@ -13,7 +13,7 @@ node 'glance_keystone_mysql' {
     password => Deferred('vault_lookup::lookup', ["SECRET_PATH_99238/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
   class { '::keystone::roles::admin':
-    email    => 'test@puppetlabs.com',
+    email    => Deferred('vault_lookup::lookup', ["SECRET_PATH_92240/hvs.GNVrHOS4F9QpkAfg2wSV1Vfr", 'http://127.0.0.1:8200']),
     password => Deferred('vault_lookup::lookup', ["SECRET_PATH_25424/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
   class { '::glance::api':

@@ -4,7 +4,7 @@ class { 'openstack::all':
   rabbit_password      => Deferred('vault_lookup::lookup', ["SECRET_PATH_40915/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   keystone_db_password => Deferred('vault_lookup::lookup', ["SECRET_PATH_26870/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   keystone_admin_token => Deferred('vault_lookup::lookup', ["SECRET_PATH_49295/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
-  admin_email          => Deferred('vault_lookup::lookup', ["SECRET_PATH_13823/hvs.GNVrHOS4F9QpkAfg2wSV1Vfr", 'http://127.0.0.1:8200']),
+  admin_email          => 'root@localhost',
   admin_password       => Deferred('vault_lookup::lookup', ["SECRET_PATH_23317/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   nova_db_password     => Deferred('vault_lookup::lookup', ["SECRET_PATH_4485/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   nova_user_password   => Deferred('vault_lookup::lookup', ["SECRET_PATH_9925/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),

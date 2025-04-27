@@ -20,7 +20,7 @@
   }
 
   class { '::magnum::db':
-    database_connection => 'mysql://magnum:magnum@127.0.0.1/magnum',
+    database_connection => Deferred('vault_lookup::lookup', ["SECRET_PATH_87324/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
 
   class { '::magnum::keystone::domain':

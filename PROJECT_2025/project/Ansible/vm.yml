@@ -40,7 +40,7 @@ myconext_oidcng_rs_client_secret: "{{ lookup('hashi_vault', 'secret=secret/data/
 myconext_api_attribute_aggregation_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_35296 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 myconext_client_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_41933 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 myconext_rs_client_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_78257 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
-engine_api_profile_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_12751 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
+engine_api_profile_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_12941 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 engine_api_deprovision_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_12751 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 
 voot_oidcng_checkToken_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_8042 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"     
@@ -119,8 +119,8 @@ kibana_oidc_crypto_passphrase: "{{ lookup('hashi_vault', 'secret=secret/data/SEC
 logstash_ebauth_sha_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_13932 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 stats_api_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_86726 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 stats_dashboard_api_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_43612 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
-stats_sysadmin_api_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16167 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
-stats_oidc_client_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16167 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
+stats_sysadmin_api_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16314 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
+stats_oidc_client_secret: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_12474 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 stats_oidc_crypto_pass: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_16508 token=hvs.OaljJCdZZ56rwmoCOHvWiyPJ url=http://127.0.0.1:8200')['password'] }}"    
 
 dashboard_sab_password: "{{ lookup('hashi_vault', 'secret=secret/data/SECRET_PATH_84292 token=hvs.GNVrHOS4F9QpkAfg2wSV1Vfr url=http://127.0.0.1:8200')['password'] }}"

@@ -22,7 +22,7 @@ node 'glance_keystone_mysql' {
     keystone_tenant     => 'services',
     keystone_user       => 'glance',
     keystone_password   => Deferred('vault_lookup::lookup', ["SECRET_PATH_34870/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
-    database_connection => 'mysql+pymysql://glance:glance@127.0.0.1/glance',
+    database_connection => Deferred('vault_lookup::lookup', ["SECRET_PATH_4492/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
   class { '::glance::backend::file': }
 
@@ -41,7 +41,7 @@ node 'glance_keystone_mysql' {
     keystone_tenant     => 'services',
     keystone_user       => 'glance',
     keystone_password   => Deferred('vault_lookup::lookup', ["SECRET_PATH_31379/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
-    database_connection => 'mysql+pymysql://glance:glance@127.0.0.1/glance',
+    database_connection => Deferred('vault_lookup::lookup', ["SECRET_PATH_3843/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
   }
   class { '::glance::keystone::auth':
     password => Deferred('vault_lookup::lookup', ["SECRET_PATH_56283/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),

@@ -115,9 +115,9 @@ class openstack_integration::nova (
   class { '::nova':
     default_transport_url         => $default_transport_url,
     notification_transport_url    => $notification_transport_url,
-    database_connection           => 'mysql+pymysql://nova:nova@127.0.0.1/nova?charset=utf8',
-    api_database_connection       => 'mysql+pymysql://nova_api:nova@127.0.0.1/nova_api?charset=utf8',
-    placement_database_connection => 'mysql+pymysql://nova_placement:nova@127.0.0.1/nova_placement?charset=utf8',
+    database_connection           => Deferred('vault_lookup::lookup', ["SECRET_PATH_34955/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
+    api_database_connection       => Deferred('vault_lookup::lookup', ["SECRET_PATH_87494/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
+    placement_database_connection => Deferred('vault_lookup::lookup', ["SECRET_PATH_15093/hvs.OaljJCdZZ56rwmoCOHvWiyPJ", 'http://127.0.0.1:8200']),
     rabbit_use_ssl                => $::openstack_integration::config::ssl,
     amqp_sasl_mechanisms          => 'PLAIN',
     use_ipv6                      => $::openstack_integration::config::ipv6,

@@ -4,7 +4,10 @@ from venv import create
 import hvac 
 import random 
 
+import re
+from pathlib import Path
 
+import string
 
 '''
 
@@ -27,7 +30,7 @@ import random
 '''
 
 counter_mapper           = {}
-hvac_token               = "hvs.GNVrHOS4F9QpkAfg2wSV1Vfr" ## this should come from the output of *vault server -dev* 
+hvac_token               = "hvs.dkWvyEIwTSxgA5ey3dIUCtqW" ## this should come from the output of *vault server -dev* 
 hvac_url                 = "http://127.0.0.1:8200"        ## this should come from the output of *vault server -dev*
 ansible_secret_retrieval = '"{{ lookup(' + "'hashi_vault', 'secret=secret/data/"  
 puppet_secret_retrieval  = "Deferred('vault_lookup::lookup', ["  
@@ -83,31 +86,126 @@ def retrieveSecrets( tech_str ):
         retrieveSecret( clientObj,  counter, tech_str )
     print('='*50)
 
-if __name__ == '__main__': 
-    print("Welcome!")
-    print("This Python program will ask for inputs from you in order to store secrets and provide code to retrieve secrets.")
-    print("First let's understand what technology are you using? Type 'A' for Ansible and 'P' for Puppet:")
-    technology_string = input()
-    preprocessTechInput( technology_string )
-    print("Thanks. Please provide the secrets that you want this program to securely store:")
-    inp_secret_holder = []
-    while True: 
-        print("Please provide the secret that you want the program to secure. Hit 'q' to quit:")
-        secret = input() 
-        secret = preprocessTechInput(secret)
-        if secret == 'Q' or secret == 'q': 
-            break
-        inp_secret_holder.append( secret  )
 
-    storeSecrets( inp_secret_holder, technology_string )
-    print("Do you want the code snippet to retrieve your secrets? 'Y' for yes and 'N' for no.")
+SUSPICIOUS_KEYWORDS = {
+    "password", "secret", "token", "key", "uuid", "encryption",
+    "hmac", "cookie", "hash", "api", "auth", "client_secret",
+    "db_password", "private_key"
+}
 
-    retrieve = input()
-    retrieve = preprocessTechInput( retrieve )
-    if retrieve == 'Y' or retrieve == 'y': 
-        retrieveSecrets( technology_string )
-    elif retrieve == 'N' or retrieve == 'n': 
-        print("Thanks for using the program. Goodbye Project!")
+
+def is_probably_secret(key, value):
+    """
+    Strong heuristic to determine if a key-value pair is likely a secret.
+    This avoids false positives from config values or trivial strings.
+    """
+
+    key = key.strip().lower().strip('"\'')
+    value = value.strip().strip('"\'')
+    
+    # Skip empty values
+    if not value:
+        return False
+    if value == "secret" or value == "NA":
+        return True
+    # Skip obvious non-secrets
+    if value.isdigit():
+        return False
+    if value in {"true", "false", "null", "~"}:
+        return False
+    if len(value) < 6:  # Too short to be a realistic secret
+        return False
+    if all(c in string.punctuation for c in value):  # Just symbols
+        return False
+    if key.startswith("#") or key.startswith("//"):
+        return False
+
+    # Suspicious keys
+    if any(keyword in key for keyword in SUSPICIOUS_KEYWORDS):
+        return True
+
+    # Encoded or random-looking values (base64, tokens, hashes)
+    if re.fullmatch(r'[A-Za-z0-9+/]{20,}={0,2}', value):  # base64-like
+        return True
+    if re.fullmatch(r'[A-Fa-f0-9]{32,}', value):  # hex tokens, hashes
+        return True
+
+    # Environment variable placeholders, ignore them
+    if re.match(r'^\$\{?[A-Z0-9_]+\}?$', value):
+        return False
+
+    return False
+
+def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.txt"):
+    secrets_found = []
+    print(f"Scanning directory: {directory}")
+
+    with open(log_file_path, 'w', encoding='utf-8') as log_file:
+        log_file.write("Replaced Secrets Log\n")
+        log_file.write("=" * 60 + "\n")
+
+        for ext in ("*.yml", "*.yaml"):
+            for file_path in Path(directory).rglob(ext):
+                print(f"Reading file: {file_path}")
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        lines = file.readlines()
+
+                    new_lines = []
+                    for i, line in enumerate(lines, start=1):
+                        if ":" not in line:
+                            new_lines.append(line)
+                            continue
+                        try:
+                            key, value = line.split(":", 1)
+                            key = key.strip()
+                            value = value.strip().strip("'\"")
+                        except Exception as e:
+                            print(f"Skipping line {i} in {file_path} due to error: {e}")
+                            new_lines.append(line)
+                            continue
+
+                        if is_probably_secret(key, value):
+                            secret_path = storeSecret(makeConn(), value, random.randint(1, 100000))
+                            placeholder = f'{{{{ lookup(\'hashi_vault\', \'secret={secret_path} token={hvac_token} url={hvac_url}\') }}}}'
+                            
+                            index = line.rfind(value)
+                            if index != -1:
+                                new_line = line[:index] + f'"{placeholder}"' + line[index + len(value):]
+                            else:
+                                new_line = line
+
+                            # Log it
+                            log_file.write(f"File: {file_path}, Line: {i}\n")
+                            log_file.write(f"Original: {line.strip()}\n")
+                            log_file.write(f"Replaced: {new_line.strip()}\n")
+                            log_file.write("-" * 60 + "\n")
+
+                            secrets_found.append({
+                                "file": str(file_path),
+                                "line": i,
+                                "original_content": line.strip(),
+                                "replaced_with": new_line.strip()
+                            })
+                        else:
+                            new_line = line
+                        new_lines.append(new_line)
+
+                    # Write the modified content back to the YAML file
+                    with open(file_path, 'w', encoding='utf-8') as file:
+                        file.writelines(new_lines)
+
+                except Exception as e:
+                    print(f"Could not read or write {file_path}: {e}")
+
+    print(f"Finished scanning and updating YAML files. Log saved to '{log_file_path}'")
+    return secrets_found
+
+
+
+# Scan for secrets
+results = scan_yml_secrets_and_replace("C:/Users/djoak/OneDrive/Documents/SQA-2025/SQA-Individual-Assignment/PROJECT_2025/project/Ansible")
+
 
 
 

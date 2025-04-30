@@ -46,7 +46,7 @@ class openstack_integration::nova (
     'host'      => $::openstack_integration::config::host,
     'port'      => $::openstack_integration::config::messaging_default_port,
     'username'  => 'nova',
-    'password' => Deferred('vault_lookup::lookup', ['SECRET_PATH_46555/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    'password'  => 'an_even_bigger_secret',
   })
 
   $notification_transport_url = os_transport_url({
@@ -54,19 +54,19 @@ class openstack_integration::nova (
     'host'      => $::openstack_integration::config::host,
     'port'      => $::openstack_integration::config::messaging_notify_port,
     'username'  => 'nova',
-    'password' => Deferred('vault_lookup::lookup', ['SECRET_PATH_9856/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    'password'  => 'an_even_bigger_secret',
   })
 
   openstack_integration::mq_user { 'nova':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_11831/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'an_even_bigger_secret',
     before   => Anchor['nova::service::begin'],
   }
 
   class { '::nova::db::mysql':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_64100/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'nova',
   }
   class { '::nova::db::mysql_api':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_19902/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password    => 'nova',
   }
   include ::nova::cell_v2::simple_setup
 
@@ -81,43 +81,43 @@ class openstack_integration::nova (
   }
 
   class { '::nova::db::mysql_placement':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_26859/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'nova',
   }
   class { '::nova::keystone::auth':
     public_url   => "${::openstack_integration::config::base_url}:8774/v2.1",
     internal_url => "${::openstack_integration::config::base_url}:8774/v2.1",
     admin_url    => "${::openstack_integration::config::base_url}:8774/v2.1",
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_71535/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password     => 'a_big_secret',
   }
   if ($::os_package_type == 'debian') {
     class { '::nova::keystone::auth_placement':
       public_url   => "${::openstack_integration::config::base_url}:8778",
       internal_url => "${::openstack_integration::config::base_url}:8778",
       admin_url    => "${::openstack_integration::config::base_url}:8778",
-      password => Deferred('vault_lookup::lookup', ['SECRET_PATH_17242/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+      password     => 'a_big_secret',
     }
   } else {
     class { '::nova::keystone::auth_placement':
       public_url   => "${::openstack_integration::config::base_url}:8778/placement",
       internal_url => "${::openstack_integration::config::base_url}:8778/placement",
       admin_url    => "${::openstack_integration::config::base_url}:8778/placement",
-      password => Deferred('vault_lookup::lookup', ['SECRET_PATH_88242/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+      password     => 'a_big_secret',
     }
   }
   class { '::nova::keystone::authtoken':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_88306/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password             => 'a_big_secret',
     user_domain_name     => 'Default',
     project_domain_name  => 'Default',
-    auth_url => Deferred('vault_lookup::lookup', ['SECRET_PATH_93248/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    www_authenticate_uri => Deferred('vault_lookup::lookup', ['SECRET_PATH_9771/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    auth_url             => $::openstack_integration::config::keystone_admin_uri,
+    www_authenticate_uri => $::openstack_integration::config::keystone_auth_uri,
     memcached_servers    => $::openstack_integration::config::memcached_servers,
   }
   class { '::nova':
     default_transport_url         => $default_transport_url,
     notification_transport_url    => $notification_transport_url,
-    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_77740/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    api_database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_39951/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    placement_database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_66210/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    database_connection           => 'mysql+pymysql://nova:nova@127.0.0.1/nova?charset=utf8',
+    api_database_connection       => 'mysql+pymysql://nova_api:nova@127.0.0.1/nova_api?charset=utf8',
+    placement_database_connection => 'mysql+pymysql://nova_placement:nova@127.0.0.1/nova_placement?charset=utf8',
     rabbit_use_ssl                => $::openstack_integration::config::ssl,
     amqp_sasl_mechanisms          => 'PLAIN',
     use_ipv6                      => $::openstack_integration::config::ipv6,
@@ -129,7 +129,7 @@ class openstack_integration::nova (
   }
   class { '::nova::api':
     api_bind_address                     => $::openstack_integration::config::host,
-    neutron_metadata_proxy_shared_secret => Deferred('vault_lookup::lookup', ['SECRET_PATH_49058/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    neutron_metadata_proxy_shared_secret => 'a_big_secret',
     metadata_workers                     => 2,
     sync_db_api                          => true,
     service_name                         => 'httpd',
@@ -137,7 +137,7 @@ class openstack_integration::nova (
   include ::apache
   class { '::nova::wsgi::apache_api':
     bind_host => $::openstack_integration::config::ip_for_url,
-    ssl_key => Deferred('vault_lookup::lookup', ['SECRET_PATH_92093/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    ssl_key   => "/etc/nova/ssl/private/${::fqdn}.pem",
     ssl_cert  => $::openstack_integration::params::cert_path,
     ssl       => $::openstack_integration::config::ssl,
     workers   => '2',
@@ -146,15 +146,15 @@ class openstack_integration::nova (
     class { '::nova::wsgi::apache_placement':
       bind_host => $::openstack_integration::config::ip_for_url,
       api_port  => '8778',
-      ssl_key => Deferred('vault_lookup::lookup', ['SECRET_PATH_77812/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+      ssl_key   => "/etc/nova/ssl/private/${::fqdn}.pem",
       ssl_cert  => $::openstack_integration::params::cert_path,
       ssl       => $::openstack_integration::config::ssl,
       workers   => '2',
     }
   }
   class { '::nova::placement':
-    auth_url => Deferred('vault_lookup::lookup', ['SECRET_PATH_89677/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_4388/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    auth_url => $::openstack_integration::config::keystone_admin_uri,
+    password => 'a_big_secret',
   }
   class { '::nova::client': }
   class { '::nova::conductor': }
@@ -173,8 +173,8 @@ class openstack_integration::nova (
     vnc_enabled                 => true,
     instance_usage_audit        => true,
     instance_usage_audit_period => 'hour',
-    keymgr_api_class => Deferred('vault_lookup::lookup', ['SECRET_PATH_88395/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    barbican_auth_endpoint => Deferred('vault_lookup::lookup', ['SECRET_PATH_86159/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    keymgr_api_class            => $keymgr_api_class,
+    barbican_auth_endpoint      => $keymgr_auth_endpoint,
     barbican_endpoint           => $barbican_endpoint,
   }
   class { '::nova::compute::libvirt':
@@ -190,10 +190,10 @@ class openstack_integration::nova (
   if $libvirt_rbd {
     class { '::nova::compute::rbd':
       libvirt_rbd_user        => 'openstack',
-      libvirt_rbd_secret_uuid => Deferred('vault_lookup::lookup', ['SECRET_PATH_23147/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-      libvirt_rbd_secret_key => Deferred('vault_lookup::lookup', ['SECRET_PATH_82651/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+      libvirt_rbd_secret_uuid => '7200aea0-2ddd-4a32-aa2a-d49f66ab554c',
+      libvirt_rbd_secret_key  => 'AQD7kyJQQGoOBhAAqrPAqSopSwPrrfMMomzVdw==',
       libvirt_images_rbd_pool => 'nova',
-      rbd_keyring => Deferred('vault_lookup::lookup', ['SECRET_PATH_34267/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+      rbd_keyring             => 'client.openstack',
       # ceph packaging is already managed by puppet-ceph
       manage_ceph_client      => false,
     }
@@ -205,9 +205,9 @@ class openstack_integration::nova (
   class { '::nova::vncproxy': }
 
   class { '::nova::network::neutron':
-    neutron_auth_url => Deferred('vault_lookup::lookup', ['SECRET_PATH_28436/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    neutron_auth_url      => "${::openstack_integration::config::keystone_admin_uri}/v3",
     neutron_url           => "${::openstack_integration::config::base_url}:9696",
-    neutron_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_52296/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    neutron_password      => 'a_big_secret',
     default_floating_pool => 'public',
   }
 

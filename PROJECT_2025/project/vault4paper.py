@@ -29,8 +29,17 @@ import string
 
 '''
 
+from dotenv import load_dotenv
+import os
+
+# Load variables from .env into environment
+load_dotenv()
+
+hvac_token = os.getenv("HVAC_TOKEN")
+hvac_url   = os.getenv("HVAC_URL")
+
 counter_mapper           = {}
-hvac_token               = "hvs.dkWvyEIwTSxgA5ey3dIUCtqW" ## this should come from the output of *vault server -dev* 
+hvac_token               = "hvs.VFfZyxeBFW7L0N9mPxqsQqcj" ## this should come from the output of *vault server -dev* 
 hvac_url                 = "http://127.0.0.1:8200"        ## this should come from the output of *vault server -dev*
 ansible_secret_retrieval = '"{{ lookup(' + "'hashi_vault', 'secret=secret/data/"  
 puppet_secret_retrieval  = "Deferred('vault_lookup::lookup', ["  
@@ -76,8 +85,6 @@ def storeSecrets(lis_secr, tech_str):
         counter = random.randint(1, 100000)
         storeSecret( clientObj,   secret2store, counter )
         counter_mapper[counter] = tech_str
-    print("Finished storing secrets!")
-    print('='*50)    
 
 
 def retrieveSecrets( tech_str ): 
@@ -94,7 +101,7 @@ SUSPICIOUS_KEYWORDS = {
 }
 
 
-def is_probably_secret(key, value):
+def is_probably_secret_yml(key, value):
     """
     Strong heuristic to determine if a key-value pair is likely a secret.
     This avoids false positives from config values or trivial strings.
@@ -112,8 +119,6 @@ def is_probably_secret(key, value):
     if value.isdigit():
         return False
     if value in {"true", "false", "null", "~"}:
-        return False
-    if len(value) < 6:  # Too short to be a realistic secret
         return False
     if all(c in string.punctuation for c in value):  # Just symbols
         return False
@@ -136,6 +141,43 @@ def is_probably_secret(key, value):
 
     return False
 
+def is_probably_secret_puppet(key, value):
+    key = key.strip().lower().strip('"\'')
+    value = value.strip().strip('"\'')
+    
+    IGNORED_KEYWORDS = {"user", "username", "tenant", "type", "email", "dbname", "host", "public_url", "admin_url"}
+    SENSITIVE_FRAGMENTS = {"password", "secret", "token", "private", "key", "auth", "connection", "uuid"}
+
+    if any(kw in key for kw in SENSITIVE_FRAGMENTS):
+        return True
+
+    if any(kw in key for kw in IGNORED_KEYWORDS):
+        return False
+
+    if not value or value.lower() in {"true", "false", "null", "~"}:
+        return False
+    if value.isdigit() and len(value) < 4:
+        return False
+    if all(c in string.punctuation for c in value):
+        return False
+    if re.match(r'^\$\{?[A-Z0-9_]+\}?$', value):
+        return False
+
+    if re.fullmatch(r'[A-Za-z0-9+/]{20,}={0,2}', value):  # base64
+        return True
+    if re.fullmatch(r'[A-Fa-f0-9]{32,}', value):  # hex
+        return True
+
+    if "://" in value and re.search(r":[^@:]+@", value):  # username:password@ in URI
+        return True
+
+    if len(value) < 6 and any(kw in key for kw in SENSITIVE_FRAGMENTS):
+        return True
+
+    return False
+
+
+
 def is_start_of_rsa_key_block(line):
     """
     Returns True if the line looks like the start of a multi-line RSA private key block.
@@ -143,14 +185,12 @@ def is_start_of_rsa_key_block(line):
     if bool(re.search(r'^\s*-{5}BEGIN RSA PRIVATE KEY-{5}\s*$', line.strip())) or bool(re.search(r'^\s*-{5}BEGIN PRIVATE KEY-{5}\s*$', line.strip())):
         return True
     return False
-    
-
 
 def handle_multiline_rsa_secret(lines, start_index, hvac_token, hvac_url):
-
     key_line = lines[start_index].strip()
 
-    block = []  # Start block with the first line
+    # Extract full RSA private key block
+    block = []
     i = start_index + 1
     while i < len(lines):
         line = lines[i].rstrip()
@@ -159,22 +199,98 @@ def handle_multiline_rsa_secret(lines, start_index, hvac_token, hvac_url):
             break
         i += 1
 
-    # Join the lines to preserve formatting
     full_rsa_key = '\n'.join(block)
 
-    print(f"Full RSA Key Block:\n{full_rsa_key}")
+    # Store the secret using your storeSecrets function
+    processed_secret = preprocessTechInput(full_rsa_key)
+    storeSecrets([processed_secret], "A")  # This also updates counter_mapper
 
-    # Store the RSA key in Vault
-    secret_path = f'SECRET_PATH_{random.randint(1, 100000)}'
-    client = makeConn()
-    client.secrets.kv.v2.create_or_update_secret(path=secret_path, secret={'password': full_rsa_key})
+    # Use the last stored counter to generate the Vault lookup
+    last_counter = list(counter_mapper.keys())[-1]
+    secret_path = f'SECRET_PATH_{last_counter}'
 
-    # Create the lookup placeholder for the YAML
-    placeholder_line = key_line.split(":")[0] + f': |'  # Keep the '|' in the YAML
-    placeholder_line += f"\n  {{{{ lookup(\'hashi_vault\', \'secret={secret_path} token={hvac_token} url={hvac_url}\')[\'password\'] }}}}'"
+    lookup_placeholder = (
+        f"{{{{ lookup('hashi_vault', 'secret=secret/data/{secret_path} "
+        f"token={hvac_token} url={hvac_url}')['password'] }}}}"
+    )
+
+    # YAML-compatible replacement line
+    yaml_key = key_line.split(":")[0]
+    placeholder_line = f"{yaml_key}: |\n  {lookup_placeholder}"
 
     # Return the new placeholder, the original block, and line numbers for logging
     return placeholder_line, block, start_index, i - 1
+
+def scan_puppet_secrets_and_replace(directory, log_file_path="replaced_puppet_secrets_log.txt"):
+    secrets_found = []
+    print(f"Scanning Puppet directory: {directory}")
+
+    with open(log_file_path, 'w', encoding='utf-8') as log_file:
+        log_file.write("Puppet Replaced Secrets Log\n")
+        log_file.write("=" * 60 + "\n")
+
+        for file_path in Path(directory).rglob("*.pp"):
+            print(f"Reading file: {file_path}")
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    lines = file.readlines()
+
+                new_lines = []
+                for i, line in enumerate(lines):
+                    if "=>" not in line:
+                        new_lines.append(line)
+                        continue
+
+                    try:
+                        key_part, value_part = line.split("=>", 1)
+                        key = key_part.strip()
+                        value = value_part.strip().rstrip(',').strip('"\'')
+                    except Exception as e:
+                        print(f"Skipping line {i + 1} in {file_path} due to error: {e}")
+                        new_lines.append(line)
+                        continue
+
+                    if is_probably_secret_puppet(key, value):
+                        processed_secret = preprocessTechInput(value)
+                        storeSecrets([processed_secret], "P")
+                        last_counter = list(counter_mapper.keys())[-1]
+                        secret_path = f'SECRET_PATH_{last_counter}'
+
+                        vault_lookup = (
+                            f"Deferred('vault_lookup::lookup', ['{secret_path}/{hvac_token}', '{hvac_url}']),"
+                        )
+
+                        # Calculate base indentation (based on the original line)
+                        indent_match = re.match(r'^(\s*)', line)
+                        indent = indent_match.group(1) if indent_match else '  '
+
+                        # Generate well-formatted secret replacement
+                        new_line = f"{indent}{key} => {vault_lookup}\n"
+
+
+                        log_file.write(f"File: {file_path}, Line: {i + 1}\n")
+                        log_file.write(f"Original: {line.strip()}\n")
+                        log_file.write(f"Replaced: {new_line.strip()}\n")
+                        log_file.write("-" * 60 + "\n")
+
+                        secrets_found.append({
+                            "file": str(file_path),
+                            "line": i + 1,
+                            "original_content": line.strip(),
+                            "replaced_with": new_line.strip()
+                        })
+                        new_lines.append(new_line)
+                    else:
+                        new_lines.append(line)
+
+                with open(file_path, 'w', encoding='utf-8') as file:
+                    file.writelines(new_lines)
+
+            except Exception as e:
+                print(f"Could not read or write {file_path}: {e}")
+
+    print(f"Finished scanning Puppet files. Log saved to '{log_file_path}'")
+    return secrets_found
 
 
 def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.txt"):
@@ -203,8 +319,6 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                             )
                             new_lines.append(placeholder_line)
 
-                            print(placeholder_line)
-
                             # Log RSA block replacement
                             log_file.write(f"File: {file_path}, Lines: {start_line_num + 1}-{end_line_num + 1}\n")
                             log_file.write("Original:\n" + ''.join(block))
@@ -230,9 +344,15 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                             i += 1
                             continue
 
-                        if is_probably_secret(key, value):
-                            secret_path = storeSecret(makeConn(), value, random.randint(1, 100000))
-                            placeholder = f'{{{{ lookup(\'hashi_vault\', \'secret={secret_path} token={hvac_token} url={hvac_url}\') }}}}'
+                        if is_probably_secret_yml(key, value):
+                            processed_secret = preprocessTechInput(value)
+                            storeSecrets([processed_secret], "A")
+                            last_counter = list(counter_mapper.keys())[-1]
+                            secret_path = f'SECRET_PATH_{last_counter}'
+                            placeholder = (
+                                f"{{{{ lookup('hashi_vault', 'secret=secret/data/{secret_path} "
+                                f"token={hvac_token} url={hvac_url}')['password'] }}}}"
+                            )
 
                             index = line.rfind(value)
                             if index != -1:
@@ -270,8 +390,9 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
 
 
 # Scan for secrets
-results = scan_yml_secrets_and_replace("C:/Users/djoak/OneDrive/Documents/SQA-2025/SQA-Individual-Assignment/PROJECT_2025/project/Ansible")
+resultsAnsible = scan_yml_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Ansible")
 
+resultsPuppet = scan_puppet_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Puppet")
 
 
 

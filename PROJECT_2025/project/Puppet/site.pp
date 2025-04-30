@@ -7,27 +7,27 @@ node 'glance_keystone_mysql' {
   class { '::keystone':
     debug        => true,
     catalog_type => 'sql',
-    admin_token => Deferred('vault_lookup::lookup', ['SECRET_PATH_57126/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    admin_token  => 'admin_token',
   }
   class { '::keystone::db::mysql':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_79391/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'keystone',
   }
   class { '::keystone::roles::admin':
     email    => 'test@puppetlabs.com',
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_64631/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'ChangeMe',
   }
   class { '::glance::api':
     debug               => true,
     auth_type           => 'keystone',
     keystone_tenant     => 'services',
     keystone_user       => 'glance',
-    keystone_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_36883/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_44364/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    keystone_password   => 'glance_password',
+    database_connection => 'mysql+pymysql://glance:glance@127.0.0.1/glance',
   }
   class { '::glance::backend::file': }
 
   class { '::glance::db::mysql':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_18463/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'glance',
     dbname   => 'glance',
     user     => 'glance',
     host     => '127.0.0.1',
@@ -40,11 +40,11 @@ node 'glance_keystone_mysql' {
     auth_type           => 'keystone',
     keystone_tenant     => 'services',
     keystone_user       => 'glance',
-    keystone_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_4584/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_38973/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    keystone_password   => 'glance_password',
+    database_connection => 'mysql+pymysql://glance:glance@127.0.0.1/glance',
   }
   class { '::glance::keystone::auth':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_54291/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'glance_pass',
   }
 }
 

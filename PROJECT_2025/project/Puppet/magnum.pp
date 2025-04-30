@@ -2,7 +2,7 @@
 
   rabbitmq_user { 'magnum':
     admin    => true,
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_49933/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'an_even_bigger_secret',
     provider => 'rabbitmqctl',
     require  => Class['::rabbitmq'],
   }
@@ -16,19 +16,19 @@
   }
 
   class { '::magnum::db::mysql':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_83125/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'magnum',
   }
 
   class { '::magnum::db':
-    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_52291/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    database_connection => 'mysql://magnum:magnum@127.0.0.1/magnum',
   }
 
   class { '::magnum::keystone::domain':
-    domain_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_97559/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    domain_password => 'oh_my_no_secret',
   }
 
   class { '::magnum::keystone::authtoken':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_66433/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => 'a_big_secret',
   }
 
   class { '::magnum::api':
@@ -36,7 +36,7 @@
   }
 
   class { '::magnum::keystone::auth':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_63107/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password     => 'a_big_secret',
     public_url   => 'http://127.0.0.1:9511/v1',
     internal_url => 'http://127.0.0.1:9511/v1',
     admin_url    => 'http://127.0.0.1:9511/v1',
@@ -46,7 +46,7 @@
     rabbit_host         => '127.0.0.1',
     rabbit_port         => '5672',
     rabbit_userid       => 'magnum',
-    rabbit_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_2196/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    rabbit_password     => 'an_even_bigger_secret',
     rabbit_use_ssl      =>  false,
     notification_driver => 'messagingv2',
   }

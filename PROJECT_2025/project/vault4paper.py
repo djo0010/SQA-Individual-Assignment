@@ -90,17 +90,12 @@ def retrieveSecrets( tech_str ):
     print('='*50)
 
 
-SUSPICIOUS_KEYWORDS = {
-    "password", "secret", "token", "key", "uuid", "encryption",
-    "hmac", "cookie", "hash", "api", "auth", "client_secret",
-    "db_password", "private_key"
-}
-
 def is_probably_secret_yml(key, value):
-    """
-    Strong heuristic to determine if a key-value pair is likely a secret.
-    This avoids false positives from config values or trivial strings.
-    """
+    SUSPICIOUS_KEYWORDS = {
+        "password", "secret", "token", "key", "uuid", "encryption",
+        "hmac", "cookie", "hash", "api", "auth", "client_secret",
+        "db_password", "private_key"
+    }
 
     key = key.strip().lower().strip('"\'')
     value = value.strip().strip('"\'')
@@ -176,9 +171,6 @@ def is_probably_secret_puppet(key, value):
     return False
 
 def is_start_of_rsa_key_block(line):
-    """
-    Returns True if the line looks like the start of a multi-line RSA private key block.
-    """
     if bool(re.search(r'^\s*-{5}BEGIN RSA PRIVATE KEY-{5}\s*$', line.strip())) or bool(re.search(r'^\s*-{5}BEGIN PRIVATE KEY-{5}\s*$', line.strip())):
         return True
     return False
@@ -495,13 +487,45 @@ def runRegularVersion():
     elif retrieve == 'N' or retrieve == 'n': 
         print("Thanks for using the program. Goodbye Project!")
 
+def list_all_secret_paths(hvac_client, mount_point="secret"):
+    try:
+        paths = hvac_client.secrets.kv.v2.list_secrets(path="", mount_point=mount_point)
+        keys = paths.get("data", {}).get("keys", [])
+        print(f"\nSecrets stored under mount '{mount_point}':")
+        for key in keys:
+            print(f"- {mount_point}/data/{key}")
+        print("Total secrets in vault:",len(keys))
+    except hvac.exceptions.InvalidPath:
+        print(f"No secrets found or invalid path under mount '{mount_point}'")
+    except Exception as e:
+        print(f"Error retrieving secret paths: {e}")
+
+def get_secret_by_path(hvac_client, secret_path, mount_point="secret"):
+    try:
+        response = hvac_client.secrets.kv.v2.read_secret_version(
+            path=secret_path,
+            mount_point=mount_point,
+            raise_on_deleted_version=False
+        )
+        data = response["data"]["data"]
+        print(f"\nSecret at path '{mount_point}/{secret_path}':")
+        for k, v in data.items():
+            print(f"  {k}: {v}")
+    except hvac.exceptions.InvalidPath:
+        print(f"Secret not found at path: '{mount_point}/{secret_path}'")
+    except Exception as e:
+        print(f"Error retrieving secret: {e}")
+
+
 if __name__ == "__main__":
     print("Please select an option:")
     print("1: Run interactive secret storage tool")
     print("2: Scan and replace secrets in YML and Puppet files")
     print("3: Only scan for secrets (no file replacement)")
+    print("4: Retrieve all secrets")
+    print("5: Retrieve details for a single entry")
 
-    user_choice = input("Enter option number (1/2/3): ").strip()
+    user_choice = input("Enter option number (1/2/3/4/5): ").strip()
 
     if user_choice == "1":
         runRegularVersion()
@@ -511,7 +535,16 @@ if __name__ == "__main__":
     elif user_choice == "3":
         resultsAnsible = scan_yml_secrets_only("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Ansible")
         resultsPuppet = scan_puppet_secrets_only("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Puppet")
+    elif user_choice == "4":
+        client = makeConn()
+        list_all_secret_paths(client)
+    elif user_choice == "5":
+        client = makeConn()
+        list_all_secret_paths(client)
+        chosen = input("Enter a secret path to retrieve (or press Enter to skip): ").strip()
+        if chosen:
+            get_secret_by_path(client, chosen)
     else:
-        print("Invalid input. Please enter 1, 2, or 3.")
+        print("Invalid input. Please enter 1, 2, 3, 4, or 5.")
 
 

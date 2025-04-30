@@ -7,27 +7,27 @@ node 'glance_keystone_mysql' {
   class { '::keystone':
     debug        => true,
     catalog_type => 'sql',
-    admin_token => Deferred('vault_lookup::lookup', ['SECRET_PATH_84570/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    admin_token => Deferred('vault_lookup::lookup', ['SECRET_PATH_57126/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
   class { '::keystone::db::mysql':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_69952/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_79391/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
   class { '::keystone::roles::admin':
     email    => 'test@puppetlabs.com',
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_55561/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_64631/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
   class { '::glance::api':
     debug               => true,
-    auth_type => Deferred('vault_lookup::lookup', ['SECRET_PATH_26706/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    keystone_tenant => Deferred('vault_lookup::lookup', ['SECRET_PATH_80887/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    keystone_user => Deferred('vault_lookup::lookup', ['SECRET_PATH_61735/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    keystone_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_3048/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_25759/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    auth_type           => 'keystone',
+    keystone_tenant     => 'services',
+    keystone_user       => 'glance',
+    keystone_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_36883/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_44364/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
   class { '::glance::backend::file': }
 
   class { '::glance::db::mysql':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_50158/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_18463/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
     dbname   => 'glance',
     user     => 'glance',
     host     => '127.0.0.1',
@@ -37,14 +37,14 @@ node 'glance_keystone_mysql' {
 
   class { '::glance::registry':
     debug               => true,
-    auth_type => Deferred('vault_lookup::lookup', ['SECRET_PATH_62251/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    keystone_tenant => Deferred('vault_lookup::lookup', ['SECRET_PATH_13336/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    keystone_user => Deferred('vault_lookup::lookup', ['SECRET_PATH_61405/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    keystone_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_9380/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
-    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_1651/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    auth_type           => 'keystone',
+    keystone_tenant     => 'services',
+    keystone_user       => 'glance',
+    keystone_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_4584/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_38973/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
   class { '::glance::keystone::auth':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_1166/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_54291/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
 }
 

@@ -9,6 +9,9 @@ from pathlib import Path
 
 import string
 
+from dotenv import load_dotenv
+import os
+
 '''
 
 1. Install Vault 
@@ -29,18 +32,11 @@ import string
 
 '''
 
-from dotenv import load_dotenv
-import os
-
-# Load variables from .env into environment
-load_dotenv()
-
+load_dotenv(dotenv_path=".env")
 hvac_token = os.getenv("HVAC_TOKEN")
 hvac_url   = os.getenv("HVAC_URL")
 
 counter_mapper           = {}
-hvac_token               = "hvs.VFfZyxeBFW7L0N9mPxqsQqcj" ## this should come from the output of *vault server -dev* 
-hvac_url                 = "http://127.0.0.1:8200"        ## this should come from the output of *vault server -dev*
 ansible_secret_retrieval = '"{{ lookup(' + "'hashi_vault', 'secret=secret/data/"  
 puppet_secret_retrieval  = "Deferred('vault_lookup::lookup', ["  
 
@@ -100,7 +96,6 @@ SUSPICIOUS_KEYWORDS = {
     "db_password", "private_key"
 }
 
-
 def is_probably_secret_yml(key, value):
     """
     Strong heuristic to determine if a key-value pair is likely a secret.
@@ -145,12 +140,16 @@ def is_probably_secret_puppet(key, value):
     key = key.strip().lower().strip('"\'')
     value = value.strip().strip('"\'')
     
-    IGNORED_KEYWORDS = {"user", "username", "tenant", "type", "email", "dbname", "host", "public_url", "admin_url"}
+    IGNORED_KEYWORDS = {
+        "user", "username", "tenant", "type", "email", "dbname", "host",
+        "public_url", "admin_url", "auth_type", "project_name", "project_domain_name",
+        "user_domain_name", "endpoint", "uri", "class", "keystone_tenant", "keystone_user"
+    }
     SENSITIVE_FRAGMENTS = {"password", "secret", "token", "private", "key", "auth", "connection", "uuid"}
 
-    if any(kw in key for kw in SENSITIVE_FRAGMENTS):
-        return True
 
+    if any(kw in key for kw in SENSITIVE_FRAGMENTS) and key not in IGNORED_KEYWORDS:
+        return True
     if any(kw in key for kw in IGNORED_KEYWORDS):
         return False
 
@@ -175,8 +174,6 @@ def is_probably_secret_puppet(key, value):
         return True
 
     return False
-
-
 
 def is_start_of_rsa_key_block(line):
     """
@@ -236,6 +233,8 @@ def scan_puppet_secrets_and_replace(directory, log_file_path="replaced_puppet_se
                     lines = file.readlines()
 
                 new_lines = []
+                local_secret_count = 0
+
                 for i, line in enumerate(lines):
                     if "=>" not in line:
                         new_lines.append(line)
@@ -280,11 +279,14 @@ def scan_puppet_secrets_and_replace(directory, log_file_path="replaced_puppet_se
                             "replaced_with": new_line.strip()
                         })
                         new_lines.append(new_line)
+                        local_secret_count += 1
                     else:
                         new_lines.append(line)
 
                 with open(file_path, 'w', encoding='utf-8') as file:
                     file.writelines(new_lines)
+
+                print(f"Replaced {local_secret_count} secret(s) in file: {file_path}")
 
             except Exception as e:
                 print(f"Could not read or write {file_path}: {e}")
@@ -292,8 +294,7 @@ def scan_puppet_secrets_and_replace(directory, log_file_path="replaced_puppet_se
     print(f"Finished scanning Puppet files. Log saved to '{log_file_path}'")
     return secrets_found
 
-
-def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.txt"):
+def scan_yml_secrets_and_replace(directory, log_file_path="replaced_yml_secrets_log.txt"):
     secrets_found = []
     print(f"Scanning directory: {directory}")
 
@@ -309,6 +310,7 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                         lines = file.readlines()
 
                     new_lines = []
+                    local_secret_count = 0                    
                     i = 0
                     while i < len(lines):
                         line = lines[i]
@@ -327,7 +329,8 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                             log_file.write("-" * 60 + "\n")
 
                             i = end_line_num + 2
-                            continue  # ✅ Skip rest of loop for RSA block
+                            local_secret_count += 1                            
+                            continue
 
                         if ":" not in line:
                             new_lines.append(line)
@@ -373,6 +376,7 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                                 "replaced_with": new_line.strip()
                             })
                             new_lines.append(new_line)
+                            local_secret_count += 1                            
                         else:
                             new_lines.append(line)
 
@@ -382,17 +386,132 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                     with open(file_path, 'w', encoding='utf-8') as file:
                         file.writelines(new_lines)
 
+                    print(f"Replaced {local_secret_count} secret(s) in file: {file_path}")
+
                 except Exception as e:
                     print(f"Could not read or write {file_path}: {e}")
 
     print(f"Finished scanning and updating YAML files. Log saved to '{log_file_path}'")
     return secrets_found
 
+def scan_puppet_secrets_only(directory):
+    print(f"Scanning Puppet directory (read-only): {directory}")
+    secrets_found = []
 
-# Scan for secrets
-resultsAnsible = scan_yml_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Ansible")
+    for file_path in Path(directory).rglob("*.pp"):
+        print(f"\n[FILE] {file_path}")
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
 
-resultsPuppet = scan_puppet_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Puppet")
+            for i, line in enumerate(lines):
+                if "=>" not in line:
+                    continue
 
+                try:
+                    key_part, value_part = line.split("=>", 1)
+                    key = key_part.strip()
+                    value = value_part.strip().rstrip(',').strip('"\'')
+                except Exception as e:
+                    print(f"  Skipping line {i + 1} due to error: {e}")
+                    continue
+
+                if is_probably_secret_puppet(key, value):
+                    print(f"  [Line {i + 1}] Potential secret → {key} => {value}")
+                    secrets_found.append((file_path, i + 1, key, value))
+        except Exception as e:
+            print(f"Could not read {file_path}: {e}")
+
+    print(f"\nCompleted scanning Puppet files. {len(secrets_found)} potential secrets found.")
+    return secrets_found
+
+def scan_yml_secrets_only(directory):
+    print(f"Scanning YAML directory (read-only): {directory}")
+    secrets_found = []
+
+    for ext in ("*.yml", "*.yaml"):
+        for file_path in Path(directory).rglob(ext):
+            print(f"\n[FILE] {file_path}")
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    lines = file.readlines()
+
+                i = 0
+                while i < len(lines):
+                    line = lines[i]
+
+                    if i + 1 < len(lines) and is_start_of_rsa_key_block(lines[i + 1]):
+                        print(f"  [Line {i + 1}] Detected start of RSA key block.")
+                        i += 1
+                        continue
+
+                    if ":" not in line:
+                        i += 1
+                        continue
+
+                    try:
+                        key, value = line.split(":", 1)
+                        key = key.strip()
+                        value = value.strip().strip('"\'')
+                    except Exception as e:
+                        print(f"  Skipping line {i + 1} due to error: {e}")
+                        i += 1
+                        continue
+
+                    if is_probably_secret_yml(key, value):
+                        print(f"  [Line {i + 1}] Potential secret → {key}: {value}")
+                        secrets_found.append((file_path, i + 1, key, value))
+
+                    i += 1
+            except Exception as e:
+                print(f"Could not read {file_path}: {e}")
+
+    print(f"\nCompleted scanning YAML files. {len(secrets_found)} potential secrets found.")
+    return secrets_found
+
+def runRegularVersion():
+    print("Welcome!")
+    print("This Python program will ask for inputs from you in order to store secrets and provide code to retrieve secrets.")
+    print("First let's understand what technology are you using? Type 'A' for Ansible and 'P' for Puppet:")
+    technology_string = input()
+    preprocessTechInput( technology_string )
+    print("Thanks. Please provide the secrets that you want this program to securely store:")
+    inp_secret_holder = []
+    while True: 
+        print("Please provide the secret that you want the program to secure. Hit 'q' to quit:")
+        secret = input() 
+        secret = preprocessTechInput(secret)
+        if secret == 'Q' or secret == 'q': 
+            break
+        inp_secret_holder.append( secret  )
+
+    storeSecrets( inp_secret_holder, technology_string )
+    print("Do you want the code snippet to retrieve your secrets? 'Y' for yes and 'N' for no.")
+
+    retrieve = input()
+    retrieve = preprocessTechInput( retrieve )
+    if retrieve == 'Y' or retrieve == 'y': 
+        retrieveSecrets( technology_string )
+    elif retrieve == 'N' or retrieve == 'n': 
+        print("Thanks for using the program. Goodbye Project!")
+
+if __name__ == "__main__":
+    print("Please select an option:")
+    print("1: Run interactive secret storage tool")
+    print("2: Scan and replace secrets in YML and Puppet files")
+    print("3: Only scan for secrets (no file replacement)")
+
+    user_choice = input("Enter option number (1/2/3): ").strip()
+
+    if user_choice == "1":
+        runRegularVersion()
+    elif user_choice == "2":
+        resultsAnsible = scan_yml_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Ansible")
+        resultsPuppet = scan_puppet_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Puppet")
+    elif user_choice == "3":
+        resultsAnsible = scan_yml_secrets_only("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Ansible")
+        resultsPuppet = scan_puppet_secrets_only("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Puppet")
+    else:
+        print("Invalid input. Please enter 1, 2, or 3.")
 
 

@@ -2,7 +2,7 @@
 
   rabbitmq_user { 'magnum':
     admin    => true,
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_48354/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_49933/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
     provider => 'rabbitmqctl',
     require  => Class['::rabbitmq'],
   }
@@ -16,19 +16,19 @@
   }
 
   class { '::magnum::db::mysql':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_91385/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_83125/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
 
   class { '::magnum::db':
-    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_29312/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    database_connection => Deferred('vault_lookup::lookup', ['SECRET_PATH_52291/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
 
   class { '::magnum::keystone::domain':
-    domain_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_78534/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    domain_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_97559/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
 
   class { '::magnum::keystone::authtoken':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_61885/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_66433/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
   }
 
   class { '::magnum::api':
@@ -36,7 +36,7 @@
   }
 
   class { '::magnum::keystone::auth':
-    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_13237/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    password => Deferred('vault_lookup::lookup', ['SECRET_PATH_63107/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
     public_url   => 'http://127.0.0.1:9511/v1',
     internal_url => 'http://127.0.0.1:9511/v1',
     admin_url    => 'http://127.0.0.1:9511/v1',
@@ -46,7 +46,7 @@
     rabbit_host         => '127.0.0.1',
     rabbit_port         => '5672',
     rabbit_userid       => 'magnum',
-    rabbit_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_88679/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
+    rabbit_password => Deferred('vault_lookup::lookup', ['SECRET_PATH_2196/hvs.VFfZyxeBFW7L0N9mPxqsQqcj', 'http://127.0.0.1:8200']),
     rabbit_use_ssl      =>  false,
     notification_driver => 'messagingv2',
   }

@@ -640,7 +640,7 @@ if __name__ == "__main__":
     Examples:
         python vault4paper.py replace --ansible-path ./Ansible --puppet-path ./Puppet
         python vault4paper.py scan --ansible-path ./Ansible --puppet-path ./Puppet
-        python vault4paper.py get SECRET_PATH_12345
+        python vault4paper.py get --path SECRET_PATH_99940
         python vault4paper.py list
 
 

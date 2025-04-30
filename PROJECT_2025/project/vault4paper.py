@@ -136,6 +136,47 @@ def is_probably_secret(key, value):
 
     return False
 
+def is_start_of_rsa_key_block(line):
+    """
+    Returns True if the line looks like the start of a multi-line RSA private key block.
+    """
+    if bool(re.search(r'^\s*-{5}BEGIN RSA PRIVATE KEY-{5}\s*$', line.strip())) or bool(re.search(r'^\s*-{5}BEGIN PRIVATE KEY-{5}\s*$', line.strip())):
+        return True
+    return False
+    
+
+
+def handle_multiline_rsa_secret(lines, start_index, hvac_token, hvac_url):
+
+    key_line = lines[start_index].strip()
+
+    block = []  # Start block with the first line
+    i = start_index + 1
+    while i < len(lines):
+        line = lines[i].rstrip()
+        block.append(line)
+        if line.strip() == "-----END RSA PRIVATE KEY-----":
+            break
+        i += 1
+
+    # Join the lines to preserve formatting
+    full_rsa_key = '\n'.join(block)
+
+    print(f"Full RSA Key Block:\n{full_rsa_key}")
+
+    # Store the RSA key in Vault
+    secret_path = f'SECRET_PATH_{random.randint(1, 100000)}'
+    client = makeConn()
+    client.secrets.kv.v2.create_or_update_secret(path=secret_path, secret={'password': full_rsa_key})
+
+    # Create the lookup placeholder for the YAML
+    placeholder_line = key_line.split(":")[0] + f': |'  # Keep the '|' in the YAML
+    placeholder_line += f"\n  {{{{ lookup(\'hashi_vault\', \'secret={secret_path} token={hvac_token} url={hvac_url}\')[\'password\'] }}}}'"
+
+    # Return the new placeholder, the original block, and line numbers for logging
+    return placeholder_line, block, start_index, i - 1
+
+
 def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.txt"):
     secrets_found = []
     print(f"Scanning directory: {directory}")
@@ -152,23 +193,47 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                         lines = file.readlines()
 
                     new_lines = []
-                    for i, line in enumerate(lines, start=1):
+                    i = 0
+                    while i < len(lines):
+                        line = lines[i]
+
+                        if i + 1 < len(lines) and is_start_of_rsa_key_block(lines[i + 1]):
+                            placeholder_line, block, start_line_num, end_line_num = handle_multiline_rsa_secret(
+                                lines, i, hvac_token, hvac_url
+                            )
+                            new_lines.append(placeholder_line)
+
+                            print(placeholder_line)
+
+                            # Log RSA block replacement
+                            log_file.write(f"File: {file_path}, Lines: {start_line_num + 1}-{end_line_num + 1}\n")
+                            log_file.write("Original:\n" + ''.join(block))
+                            log_file.write("\n")
+                            log_file.write(f"Replaced: {placeholder_line.strip()}\n")
+                            log_file.write("-" * 60 + "\n")
+
+                            i = end_line_num + 2
+                            continue  # ✅ Skip rest of loop for RSA block
+
                         if ":" not in line:
                             new_lines.append(line)
+                            i += 1
                             continue
+
                         try:
                             key, value = line.split(":", 1)
                             key = key.strip()
                             value = value.strip().strip("'\"")
                         except Exception as e:
-                            print(f"Skipping line {i} in {file_path} due to error: {e}")
+                            print(f"Skipping line {i + 1} in {file_path} due to error: {e}")
                             new_lines.append(line)
+                            i += 1
                             continue
 
                         if is_probably_secret(key, value):
                             secret_path = storeSecret(makeConn(), value, random.randint(1, 100000))
                             placeholder = f'{{{{ lookup(\'hashi_vault\', \'secret={secret_path} token={hvac_token} url={hvac_url}\') }}}}'
-                            
+
                             index = line.rfind(value)
                             if index != -1:
                                 new_line = line[:index] + f'"{placeholder}"' + line[index + len(value):]
@@ -176,20 +241,22 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
                                 new_line = line
 
                             # Log it
-                            log_file.write(f"File: {file_path}, Line: {i}\n")
+                            log_file.write(f"File: {file_path}, Line: {i + 1}\n")
                             log_file.write(f"Original: {line.strip()}\n")
                             log_file.write(f"Replaced: {new_line.strip()}\n")
                             log_file.write("-" * 60 + "\n")
 
                             secrets_found.append({
                                 "file": str(file_path),
-                                "line": i,
+                                "line": i + 1,
                                 "original_content": line.strip(),
                                 "replaced_with": new_line.strip()
                             })
+                            new_lines.append(new_line)
                         else:
-                            new_line = line
-                        new_lines.append(new_line)
+                            new_lines.append(line)
+
+                        i += 1
 
                     # Write the modified content back to the YAML file
                     with open(file_path, 'w', encoding='utf-8') as file:
@@ -200,7 +267,6 @@ def scan_yml_secrets_and_replace(directory, log_file_path="replaced_secrets_log.
 
     print(f"Finished scanning and updating YAML files. Log saved to '{log_file_path}'")
     return secrets_found
-
 
 
 # Scan for secrets

@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 
 import string
+import argparse
+import sys
 
 from dotenv import load_dotenv
 import os
@@ -516,8 +518,7 @@ def get_secret_by_path(hvac_client, secret_path, mount_point="secret"):
     except Exception as e:
         print(f"Error retrieving secret: {e}")
 
-
-if __name__ == "__main__":
+def run_menu():
     print("Please select an option:")
     print("1: Run interactive secret storage tool")
     print("2: Scan and replace secrets in YML and Puppet files")
@@ -530,11 +531,11 @@ if __name__ == "__main__":
     if user_choice == "1":
         runRegularVersion()
     elif user_choice == "2":
-        resultsAnsible = scan_yml_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Ansible")
-        resultsPuppet = scan_puppet_secrets_and_replace("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Puppet")
+        scan_yml_secrets_and_replace("Ansible")
+        scan_puppet_secrets_and_replace("Puppet")
     elif user_choice == "3":
-        resultsAnsible = scan_yml_secrets_only("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Ansible")
-        resultsPuppet = scan_puppet_secrets_only("C:/Users/DJ/Documents/SQA_Project/SQA-2025/PROJECT_2025/project/Puppet")
+        scan_yml_secrets_only("Ansible")
+        scan_puppet_secrets_only("Puppet")
     elif user_choice == "4":
         client = makeConn()
         list_all_secret_paths(client)
@@ -545,6 +546,113 @@ if __name__ == "__main__":
         if chosen:
             get_secret_by_path(client, chosen)
     else:
-        print("Invalid input. Please enter 1, 2, 3, 4, or 5.")
+        print("Invalid input. Please enter 1 to 5.")
+
+def main():
+    parser = argparse.ArgumentParser(description="Vault Secret Tool")
+    subparsers = parser.add_subparsers(dest="command")
+
+    # CLI: interactive
+    subparsers.add_parser("interactive", help="Run interactive menu")
+
+    # CLI: scan-only
+    scan_parser = subparsers.add_parser("scan", help="Scan for secrets without modifying files")
+    scan_parser.add_argument("--ansible-path", required=True)
+    scan_parser.add_argument("--puppet-path", required=True)
+
+    # CLI: replace
+    replace_parser = subparsers.add_parser("replace", help="Scan and replace secrets")
+    replace_parser.add_argument("--ansible-path", required=True)
+    replace_parser.add_argument("--puppet-path", required=True)
+
+    # CLI: list all vault paths
+    subparsers.add_parser("list", help="List all secrets from Vault")
+
+    # CLI: get a single secret
+    get_parser = subparsers.add_parser("get", help="Retrieve a secret by path")
+    get_parser.add_argument("--path", required=True)
+
+    args = parser.parse_args()
+
+    # Run the selected command
+    if not args.command:
+        run_menu()
+    elif args.command == "interactive":
+        runRegularVersion()
+    elif args.command == "scan":
+        scan_yml_secrets_only(args.ansible_path)
+        scan_puppet_secrets_only(args.puppet_path)
+    elif args.command == "replace":
+        scan_yml_secrets_and_replace(args.ansible_path)
+        scan_puppet_secrets_and_replace(args.puppet_path)
+    elif args.command == "list":
+        client = makeConn()
+        list_all_secret_paths(client)
+    elif args.command == "get":
+        client = makeConn()
+        get_secret_by_path(client, args.path)
+    else:
+        print("Unknown command")
+
+if __name__ == "__main__":
+    """
+    This script supports both interactive and command-line usage modes to manage secret scanning and Vault integration.
+
+    To use the interactive menu, first run vault server --dev
+
+    Next, take the hvac token and put it in the .env file.
+
+    Next, run this command in the project directory:
+    python vault4paper.py
+
+    Available operations:
+    1. Run the regular puppet/ansible menu.
+    2. Scan and replace secrets in YAML (.yml/.yaml) and Puppet (.pp) files.
+    3. Scan for secrets (read-only, no replacement).
+    4. List all secret paths stored in Vault.
+    5. Retrieve and display details of a specific secret path.
+
+    Usage (interactive menu):
+        python vault4paper.py
+
+    If you want to use the CLI:
+
+    Usage (CLI arguments):
+
+    Basic commands:
+        python vault4paper.py interactive
+            → Launches the interactive tool for manually storing secrets and retrieving lookup code.
+
+        python vault4paper.py replace --ansible-path ./Ansible --puppet-path ./Puppet
+            → Scans Ansible YAML files and Puppet manifests, replaces detected secrets with Vault lookups,
+            and logs the changes to corresponding log files.
+
+        python vault4paper.py scan --ansible-path ./Ansible --puppet-path ./Puppet
+            → Performs a dry-run scan of Ansible YAML files and Puppet manifests,
+            printing potential secrets to the terminal without modifying files.
+
+        python vault4paper.py list
+            → Lists all secrets stored in Vault under the default mount point.
+
+        python vault4paper.py get SECRET_PATH_NAME
+            → Retrieves and prints the full secret stored under the given Vault path.
+
+    Examples:
+        python vault4paper.py replace --ansible-path ./Ansible --puppet-path ./Puppet
+        python vault4paper.py scan --ansible-path ./Ansible --puppet-path ./Puppet
+        python vault4paper.py get SECRET_PATH_12345
+        python vault4paper.py list
+
+
+    If you want to revert all secrets back to their original state, run this command:
+        python vault4paper_antidote.py
+
+    All replaced details for secrets are logged in the replaced_puppet_secrets_log.txt and replaced_yml_secrets_log.txt files.
+        
+    """
+
+
+
+    main()
 
 
